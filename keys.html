@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Canvas com circulo azul</title>
+	<style>
+		body {
+			background-color: blue;
+		}
+		canvas {
+			background-color: blue;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="myCanvas" width="500" height="500"></canvas>
+
+	<script>
+		const canvas = document.getElementById('myCanvas');
+		const ctx = canvas.getContext('2d');
+		ctx.fillStyle = 'darkblue';
+        fetch("keys.wasm") 
+   .then(bytes => bytes.arrayBuffer()) 
+   .then(mod => WebAssembly.compile(mod)) 
+   .then(module => {
+    
+    let instance = new WebAssembly.Instance(module); 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			// Desenha um circulo com as coordenadas da tecla pressionada
+			const x = getX(0);
+			const y = getY(0);
+			ctx.beginPath();
+			ctx.arc(x, y, 50, 0, 2 * Math.PI);
+			ctx.fill();
+    
+      
+ 
+		document.addEventListener('keydown', event => {
+			// Apaga o canvas
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			// Desenha um circulo com as coordenadas da tecla pressionada
+			const x = getX(event.key);
+			const y = getY(event.key);
+			ctx.beginPath();
+			ctx.arc(x, y, 50, 0, 2 * Math.PI);
+			ctx.fill();
+		});
+
+		function getX(key) {
+			switch(key) {
+				case 'ArrowLeft':
+					return instance.exports.getx(1); // Código da tecla cursora esquerda
+				case 'ArrowRight':
+					return instance.exports.getx(2); // Código da tecla cursora direita
+				default:
+					return instance.exports.getx(0); // Centro do canvas
+			}
+		}
+
+		function getY(key) {
+			switch(key) {
+				case 'ArrowUp':
+                    return instance.exports.gety(1); // Código da tecla cursora para cima
+				case 'ArrowDown':
+					return  instance.exports.gety(2); // Código da tecla cursora para baixo
+				default:
+                return instance.exports.gety(0); // Centro do canvas
+            }
+        }
+    });
+    </script>
+</body>
+</html>
